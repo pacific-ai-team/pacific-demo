@@ -1,9 +1,10 @@
 import os
 from typing import List, Optional
 
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
@@ -32,6 +33,9 @@ app = FastAPI(title="Personal Search Demo")
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
+# --- Template Engine Setup ---
+templates = Jinja2Templates(directory="app/templates")
+
 # --- Components Initialization ---
 personal_searcher = PersonalSearch()
 reranker = Reranker()
@@ -52,6 +56,12 @@ llm_agent = Agent(
 async def read_index():
     """Serves the main HTML page."""
     return FileResponse('app/static/index.html')
+
+@app.get("/table")
+async def table_page(request: Request):
+    """Serves the table HTML page."""
+    # Use Request for template context if needed, otherwise it can be omitted
+    return templates.TemplateResponse("table.html", {"request": request})
 
 @app.get("/search", response_model=SearchResponse)
 async def search_endpoint(query: str = Query(..., min_length=1)):
