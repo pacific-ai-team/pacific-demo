@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Search Demo</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <h1>Personal Search Demo</h1>
+
+    <form id="search-form">
+        <input type="text" id="search-query" placeholder="Ask a question..." required>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results-area">
+        <h2>Results</h2>
+        <div id="loading" style="display: none;">Loading...</div>
+        <div id="error-message" class="error" style="display: none;"></div>
+        <div id="llm-summary"></div>
+        <h3>Returned Chunks</h3>
+        <div id="chunks-list"></div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
