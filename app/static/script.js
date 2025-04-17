@@ -127,5 +127,5 @@ document.getElementById('search-form').addEventListener('submit', async function
 
     // You might want to store the socket object if you need to send messages later
     // window.myWebSocket = socket;
-    s
+
 })(); // Immediately invoke the function to set up WebSocket on load 
