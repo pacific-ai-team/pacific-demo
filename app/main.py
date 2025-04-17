@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 
-from .components.models import Chunk
-from .components.personal_search import PersonalSearch
-from .components.reranker import Reranker
+from app.components.models import Chunk
+from app.components.personal_search import PersonalSearch
+from app.components.reranker import Reranker
 
 # Load environment variables (for OPENAI_API_KEY)
 load_dotenv()

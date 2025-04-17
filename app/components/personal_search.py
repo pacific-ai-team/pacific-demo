@@ -1,5 +1,5 @@
 from typing import List, Set, Tuple
-from .models import Chunk
+from app.components.models import Chunk
 
 # --- Trigram Helper Functions ---
 

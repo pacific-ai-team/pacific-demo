@@ -1,5 +1,5 @@
 from typing import List
-from .models import Chunk
+from app.components.models import Chunk
 
 class Reranker:
     def rerank(self, query: str, chunks: List[Chunk]) -> List[Chunk]:
