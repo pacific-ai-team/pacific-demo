@@ -1,4 +1,5 @@
 let socket = null; // Declare socket in a higher scope
+let currentChunks = []; // Store chunks for the current query
 
 // --- WebSocket Connection Logic ---
 (function setupWebSocket() {
@@ -20,29 +21,32 @@ let socket = null; // Declare socket in a higher scope
         const llmSummaryDiv = document.getElementById('llm-summary');
         const chunksListDiv = document.getElementById('chunks-list');
 
-        loadingDiv.style.display = 'none'; // Hide loading when response arrives
+        loadingDiv.style.display = 'none'; // Hide loading when first response arrives
 
         try {
             const message = JSON.parse(event.data);
 
             // --- Handle incoming messages ---
-            if (message.action === 'results' && Array.isArray(message.data)) { // Check if data is an array
+            if (message.action === 'results' && message.data) { // Check if data exists
                 errorDiv.style.display = 'none';
                 errorDiv.textContent = '';
 
-                const chunks = message.data; // Data is the list of chunks
-                // Clear LLM Summary display as it's no longer expected in this format
-                llmSummaryDiv.innerHTML = '';
+                const newChunks = Array.isArray(message.data) ? message.data : [message.data]; // Handle single or array
 
-                // Display Reranked Chunks
-                chunksListDiv.innerHTML = ''; // Clear previous chunks
-                if (chunks && chunks.length > 0) {
-                    chunks.forEach((chunk, index) => {
+                // Append new chunks to the persistent list for this query
+                currentChunks.push(...newChunks);
+
+                // Re-render the entire list of chunks
+                chunksListDiv.innerHTML = ''; // Clear previous display
+                llmSummaryDiv.innerHTML = ''; // Clear any previous summary (can be added later if needed)
+
+                if (currentChunks.length > 0) {
+                    currentChunks.forEach((chunk, index) => {
                         const chunkElement = document.createElement('div');
                         chunkElement.classList.add('chunk');
 
                         const rankP = document.createElement('p');
-                        rankP.innerHTML = `<b>Rank:</b> ${index + 1}`;
+                        rankP.innerHTML = `<b>Rank:</b> ${index + 1}`; // Rank based on current accumulated list
 
                         const textP = document.createElement('p');
                         textP.innerHTML = `<b>Text:</b> ${chunk.text}`;
@@ -65,7 +69,9 @@ let socket = null; // Declare socket in a higher scope
                         chunksListDiv.appendChild(chunkElement);
                     });
                 } else {
-                    chunksListDiv.textContent = 'No chunks returned.';
+                    // This case might not be reached if we always push before rendering,
+                    // but good practice to handle it.
+                    chunksListDiv.textContent = 'No chunks received yet.';
                 }
 
             } else if (message.action === 'error' && message.data) {
@@ -74,14 +80,27 @@ let socket = null; // Declare socket in a higher scope
                 errorDiv.style.display = 'block';
                 llmSummaryDiv.innerHTML = '';
                 chunksListDiv.innerHTML = '';
+                currentChunks = []; // Clear stored chunks on error
             } else {
-                console.warn("Received unknown message format or data is not an array:", message);
+                // Handle potential summary message or other actions if needed in the future
+                if (message.action !== 'results' && message.action !== 'error') {
+                    console.log("Received message with action:", message.action, message);
+                    // Example: Handle a final summary message
+                    // if (message.action === 'summary' && message.data) {
+                    //     llmSummaryDiv.textContent = message.data.summary || 'Summary received.';
+                    // }
+                } else {
+                    console.warn("Received results message with no data or unknown message format:", message);
+                }
             }
 
         } catch (e) {
             console.error("Failed to parse WebSocket message or update UI:", e);
             errorDiv.textContent = 'Failed to process server response.';
             errorDiv.style.display = 'block';
+            // Decide if we should clear chunks here - maybe keep existing ones?
+            // currentChunks = [];
+            // chunksListDiv.innerHTML = '';
         }
     };
 
@@ -92,6 +111,9 @@ let socket = null; // Declare socket in a higher scope
             errorDiv.textContent = `WebSocket connection error. Check console. Is the server running and WS endpoint available?`;
             errorDiv.style.display = 'block';
         }
+        // Clear chunks on WebSocket error?
+        // currentChunks = [];
+        // if(document.getElementById('chunks-list')) document.getElementById('chunks-list').innerHTML = '';
     };
 
     socket.onclose = function (event) {
@@ -106,6 +128,9 @@ let socket = null; // Declare socket in a higher scope
             }
         }
         socket = null; // Clear socket variable
+        // Optionally clear chunks when connection closes unexpectedly
+        // currentChunks = [];
+        // if(document.getElementById('chunks-list')) document.getElementById('chunks-list').innerHTML = '';
     };
 
 })(); // Immediately invoke the function to set up WebSocket on load
@@ -127,6 +152,7 @@ document.getElementById('search-form').addEventListener('submit', function (even
     errorDiv.style.display = 'none';
     errorDiv.textContent = '';
     loadingDiv.style.display = 'block'; // Show loading indicator
+    currentChunks = []; // Reset chunks for new query
 
     if (socket && socket.readyState === WebSocket.OPEN) {
         console.log(`Sending query via WebSocket: ${query}`);
