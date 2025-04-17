@@ -75,4 +75,57 @@ document.getElementById('search-form').addEventListener('submit', async function
         // Hide loading indicator
         loadingDiv.style.display = 'none';
     }
-}); 
+});
+
+// --- WebSocket Connection Logic ---
+(function setupWebSocket() {
+    // Determine ws protocol based on http protocol
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Construct WebSocket URL using current host and port
+    const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+
+    console.log(`Attempting to connect WebSocket: ${wsUrl}`);
+
+    const socket = new WebSocket(wsUrl);
+
+    socket.onopen = function (event) {
+        console.log("WebSocket connection established.");
+        // Optional: Send a message upon connection
+        // socket.send(JSON.stringify({ type: "greeting", message: "Hello Server!" }));
+    };
+
+    socket.onmessage = function (event) {
+        console.log("WebSocket message received:", event.data);
+        // Handle incoming messages here
+        // const message = JSON.parse(event.data);
+        // switch(message.type) { ... }
+    };
+
+    socket.onerror = function (error) {
+        console.error("WebSocket Error:", error);
+        // Display error to user?
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.textContent = `WebSocket connection error. Check console.`;
+            errorDiv.style.display = 'block';
+        }
+    };
+
+    socket.onclose = function (event) {
+        if (event.wasClean) {
+            console.log(`WebSocket connection closed cleanly, code=${event.code} reason=${event.reason}`);
+        } else {
+            // e.g. server process killed or network down
+            console.error('WebSocket connection died');
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = `WebSocket connection closed unexpectedly.`;
+                errorDiv.style.display = 'block';
+            }
+        }
+    };
+
+    // You might want to store the socket object if you need to send messages later
+    // window.myWebSocket = socket;
+    s
+})(); // Immediately invoke the function to set up WebSocket on load 
