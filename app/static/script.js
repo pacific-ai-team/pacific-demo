@@ -26,18 +26,18 @@ let socket = null; // Declare socket in a higher scope
             const message = JSON.parse(event.data);
 
             // --- Handle incoming messages ---
-            if (message.action === 'results' && message.data) {
+            if (message.action === 'results' && Array.isArray(message.data)) { // Check if data is an array
                 errorDiv.style.display = 'none';
                 errorDiv.textContent = '';
 
-                const data = message.data;
-                // Display LLM Summary
-                llmSummaryDiv.textContent = data.llm_summary || 'No LLM summary available.';
+                const chunks = message.data; // Data is the list of chunks
+                // Clear LLM Summary display as it's no longer expected in this format
+                llmSummaryDiv.innerHTML = '';
 
                 // Display Reranked Chunks
                 chunksListDiv.innerHTML = ''; // Clear previous chunks
-                if (data.reranked_chunks && data.reranked_chunks.length > 0) {
-                    data.reranked_chunks.forEach((chunk, index) => {
+                if (chunks && chunks.length > 0) {
+                    chunks.forEach((chunk, index) => {
                         const chunkElement = document.createElement('div');
                         chunkElement.classList.add('chunk');
 
@@ -75,7 +75,7 @@ let socket = null; // Declare socket in a higher scope
                 llmSummaryDiv.innerHTML = '';
                 chunksListDiv.innerHTML = '';
             } else {
-                console.warn("Received unknown message format:", message);
+                console.warn("Received unknown message format or data is not an array:", message);
             }
 
         } catch (e) {
