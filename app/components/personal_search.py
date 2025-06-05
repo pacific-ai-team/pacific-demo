@@ -60,6 +60,20 @@ HARDCODED_CHUNKS = [
     Chunk(id=34, text="Acme Corp profit margin improved to 18% in the last quarter.", source="Acme_Q3_Analysis", embedding_similarity_score=0.86),
     Chunk(id=35, text="Cyberdyne's Skynet project timeline remains on schedule according to internal reports.", source="Cyberdyne_ProjectUpdate", embedding_similarity_score=0.60),
     Chunk(id=36, text="Wonka revenues were up 10% in the last quarter to $200 Million.", source="CandyNews_Wonka", embedding_similarity_score=0.83),
+    Chunk(id=37, text="Aperture Science introduces new long-fall boots for test subjects.", source="Aperture_ProductRelease", embedding_similarity_score=0.78),
+    Chunk(id=38, text="Black Mesa incident containment costs have exceeded initial projections by 300%.", source="BlackMesa_InternalAudit", embedding_similarity_score=0.92),
+    Chunk(id=39, text="Omni Consumer Products (OCP) has secured the security contract for Old Detroit.", source="DetroitNews_OCP", embedding_similarity_score=0.95),
+    Chunk(id=40, text="Stark Industries' Arc Reactor technology sees a breakthrough in efficiency.", source="TechCrunch_Stark", embedding_similarity_score=0.96),
+    Chunk(id=41, text="The Gringotts Wizarding Bank reports a surge in goblin-led security audits.", source="DailyProphet_Finance", embedding_similarity_score=0.65),
+    Chunk(id=42, text="CHOAM company profits are intricately linked with spice production on Arrakis.", source="ArrakisEconomicReview", embedding_similarity_score=0.88),
+    Chunk(id=43, text="Rekall Inc. faces scrutiny over the psychological impact of memory implants.", source="MarsChronicle_Health", embedding_similarity_score=0.72),
+    Chunk(id=44, text="Yoyodyne Propulsion Systems denies rumors of inter-dimensional travel research.", source="GroversMillGazette", embedding_similarity_score=0.68),
+    Chunk(id=45, text="Cyberdyne Systems model 101 sales are performing well in the private security sector.", source="Cyberdyne_SalesDeck", embedding_similarity_score=0.81),
+    Chunk(id=46, text="Weyland-Yutani xenomorph research budget has been secretly tripled.", source="WY_ClassifiedMemo", embedding_similarity_score=0.97),
+    Chunk(id=47, text="The Sirius Cybernetics Corporation's marketing division won an award for their 'Share and Enjoy' campaign.", source="GalacticMarketingAwards", embedding_similarity_score=0.55),
+    Chunk(id=48, text="Wayne Enterprises has acquired a new patent for advanced grappling hook technology.", source="WayneTech_IPReport", embedding_similarity_score=0.85),
+    Chunk(id=49, text="Soylent Green production is up 15% to meet rising consumer demand.", source="SoylentCorp_Q4Report", embedding_similarity_score=0.89),
+    Chunk(id=50, text="Massive Dynamic founder William Bell is scheduled to give a talk on fringe science.", source="HarvardScienceJournal", embedding_similarity_score=0.77),
 ]
 
 # --- Minimum number of chunks to return ---
@@ -75,38 +89,6 @@ class PersonalSearch:
         """
         print(f"PersonalSearch: Searching for '{query}' using trigram matching...")
 
-        query_trigrams = get_trigrams(query)
-        if not query_trigrams:
-            print("PersonalSearch: Query trigrams empty, returning first few chunks.")
-            return HARDCODED_CHUNKS[:MIN_CHUNKS_TO_RETURN]
-
-        # Calculate similarity for all chunks
-        chunks_with_similarity: List[Tuple[Chunk, float]] = []
-        print(f"PersonalSearch: Calculating similarity for {len(HARDCODED_CHUNKS)} total chunks.")
-        for chunk in HARDCODED_CHUNKS:
-            # Important: Reset score from previous runs if any
-            chunk.trigram_similarity_score = None
-            chunk_trigrams = get_trigrams(chunk.text)
-            similarity = trigram_similarity(query_trigrams, chunk_trigrams)
-            chunks_with_similarity.append((chunk, similarity))
-
-        # Sort all chunks by similarity score (descending)
-        chunks_with_similarity.sort(key=lambda item: item[1], reverse=True)
-
-        # Get the top N chunks, ensuring at least MIN_CHUNKS are returned
-        # Use min() here to avoid index errors if total chunks < MIN_CHUNKS
-        num_to_consider = min(len(chunks_with_similarity), max(MIN_CHUNKS_TO_RETURN, 1)) # Consider at least top N, or fewer if less exist
-
-        top_chunks_data = chunks_with_similarity[:num_to_consider]
-
-        # Store the calculated similarity score on the chunk object
-        final_chunks = []
-        print(f"PersonalSearch: Selecting top {len(top_chunks_data)} chunks based on trigram similarity.")
-        for i, (chunk, score) in enumerate(top_chunks_data):
-            chunk.trigram_similarity_score = score # Store the score
-            final_chunks.append(chunk)
-            print(f"  Rank {i+1} (Trigram): Chunk ID {chunk.id}, Similarity: {score:.3f}, Text: {chunk.text[:60]}...")
-
 
         # Return only the number needed, already sorted by trigram
-        return final_chunks 
+        return HARDCODED_CHUNKS[:MIN_CHUNKS_TO_RETURN]
