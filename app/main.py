@@ -63,7 +63,7 @@ async def table_page(request: Request):
     # Use Request for template context if needed, otherwise it can be omitted
     return templates.TemplateResponse("table.html", {"request": request})
 
-# TODO: add search endpoint here
+# TODO: add search endpoint here (hint, you need a query: str param)
 
 # --- Health Check (Optional) ---
 @app.get("/health")
