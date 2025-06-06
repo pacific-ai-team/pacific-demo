@@ -21,6 +21,10 @@ def trigram_similarity(set1: Set[str], set2: Set[str]) -> float:
     # Avoid division by zero
     return float(intersection) / union if union > 0 else 0.0
 
+# com, omp, mpa, pan
+# any, ani, nie, ies
+# com, omp, mpa, pan, any, ani, nie, ies
+
 # --- Expanded Hardcoded Data ---
 # Original Fruit/Veggie Data + ~30 Financial/Company Chunks
 HARDCODED_CHUNKS = [
@@ -77,18 +81,70 @@ HARDCODED_CHUNKS = [
 ]
 
 # --- Minimum number of chunks to return ---
-MIN_CHUNKS_TO_RETURN = 2
+MIN_CHUNKS_TO_RETURN = 10
 
 # --- Personal Search Component ---
 class PersonalSearch:
     def search(self, query: str) -> List[Chunk]:
         """
-        Finds chunks similar to the query using trigram matching.
+        Finds chunks similar to the query using word similarity matching.
         Stores the similarity score on the chunk object.
         Always returns at least MIN_CHUNKS_TO_RETURN, sorted by similarity.
         """
-        print(f"PersonalSearch: Searching for '{query}' using trigram matching...")
-
-
-        # Return only the number needed, already sorted by trigram
+        print(f"PersonalSearch: Searching for '{query}' using word similarity matching...")
+        query_words = set(query.lower().split())
+        
+        for chunk in HARDCODED_CHUNKS:
+            chunk_words = set(chunk.text.lower().split())
+            chunk.trigram_similarity_score = trigram_similarity(query_words, chunk_words)
+            print(f"PersonalSearch: Chunk {chunk.id}, trigram similarity score: {chunk.trigram_similarity_score}")
+            matching_words = 0
+            
+            for query_word in query_words:
+                # Check each chunk word for similarity with the query word
+                for chunk_word in chunk_words:
+                    if words_are_similar(query_word, chunk_word):
+                        matching_words += 1
+                        break  # Move to next query word once we find a match
+            
+            chunk.embedding_similarity_score = matching_words / len(query_words) if query_words else 0
+            print(f"PersonalSearch: Chunk {chunk.id}, matching words: {matching_words}, total query words: {len(query_words)}, similarity score: {chunk.embedding_similarity_score}")
+        
+        HARDCODED_CHUNKS.sort(key=lambda x: x.embedding_similarity_score, reverse=True)
         return HARDCODED_CHUNKS[:MIN_CHUNKS_TO_RETURN]
+
+def levenshtein_distance(s1: str, s2: str) -> int:
+    """
+    Calculate the Levenshtein edit distance between two strings.
+    Returns the minimum number of single-character edits needed to change one string into another.
+    """
+    if len(s1) < len(s2):
+        return levenshtein_distance(s2, s1)
+
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1
+            deletions = current_row[j] + 1
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
+
+def words_are_similar(word1: str, word2: str, threshold: float = 0.8) -> bool:
+    """
+    Determine if two words are similar based on edit distance.
+    threshold: minimum similarity score (0-1) for words to be considered similar
+    """
+    if not word1 or not word2:
+        return False
+    
+    max_len = max(len(word1), len(word2))
+    distance = levenshtein_distance(word1.lower(), word2.lower())
+    similarity = 1 - (distance / max_len)
+    return similarity >= threshold
