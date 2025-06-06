@@ -43,7 +43,7 @@ reranker = Reranker()
 # --- Pydantic AI Agent --- 
 # Ensure OPENAI_API_KEY is set in your environment or .env file
 llm_agent = Agent(
-    "openai:gpt-4o-mini", 
+    "openai:gpt-4o-mini",
     system_prompt=(
         "You are a helpful assistant. Based *only* on the provided text chunks, "
         "answer the user's query concisely. Indicate your confidence."
@@ -64,6 +64,19 @@ async def table_page(request: Request):
     return templates.TemplateResponse("table.html", {"request": request})
 
 # TODO: add search endpoint here (hint, you need a query: str param)
+@app.get("/search")
+async def search(query: str):
+    """Searches the personal search index and returns a response."""
+    initial_chunks = personal_searcher.search(query)
+    reranked_chunks = reranker.rerank(query, initial_chunks)
+    
+    llm_summary = await llm_agent.run(context)
+    return SearchResponse(
+        llm_summary=llm_summary.output.explanation,
+        reranked_chunks=reranked_chunks,
+        original_query=query
+    )
+
 
 # --- Health Check (Optional) ---
 @app.get("/health")
