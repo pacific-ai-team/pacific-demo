@@ -40,6 +40,14 @@ class Answer(BaseModel):
 # --- FastAPI App Setup ---
 app = FastAPI(title="Personal Search Demo")
 
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'none'"
+    return response
+
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
