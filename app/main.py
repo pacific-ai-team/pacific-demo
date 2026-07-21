@@ -66,7 +66,7 @@ llm_agent = Agent(
         "You are a helpful assistant. Based *only* on the provided text chunks, "
         "answer the user's query concisely. Indicate your confidence."
     ),
-    result_type=Answer,
+    output_type=Answer,  # pydantic-ai 1.x renamed result_type -> output_type
 )
 
 
