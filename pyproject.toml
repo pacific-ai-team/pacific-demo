@@ -11,7 +11,7 @@ python = ">=3.10,<3.12"
 fastapi = ">=0.115.12"
 uvicorn = {extras = ["standard"], version = ">=0.34.2"}
 pydantic = ">=2.11.4"
-pydantic-ai = "^0.2.5"
+pydantic-ai = ">=1.56.0,<2" # CVE-2026-25580 (SSRF); fixed in 1.56.0. Capped <2: V2 adds breaking changes beyond the validated call-site migration.
 openai = ">=1.79.0"
 python-dotenv = ">=1.0.0"
 jinja2 = "^3.1.6"
