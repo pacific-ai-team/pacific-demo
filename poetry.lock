@@ -1525,13 +1525,13 @@ trio = ["trio (>=0.22.0,<1.0)"]
 
 [[package]]
 name = "httpcore2"
-version = "2.7.0"
+version = "2.14.0"
 description = "A minimal low-level HTTP client."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "httpcore2-2.7.0-py3-none-any.whl", hash = "sha256:1452f589fe23f55b44546cd884294c41a29330af902bc0b71a761fd52d18f92b"},
-    {file = "httpcore2-2.7.0.tar.gz", hash = "sha256:6dc0fedf329a52a990930a5579edfebaea81118ea700ea0dd7de2b5e5be49efc"},
+    {file = "httpcore2-2.14.0-py3-none-any.whl", hash = "sha256:4c4f64f4b544afeb778c42c0ffb5941b29e671157e90ed3f6dc787c4bca90cd1"},
+    {file = "httpcore2-2.14.0.tar.gz", hash = "sha256:4f57a1a8249fe6af589d935cfd456f1d13bbdcb0f0fc72af9142368fc94811d7"},
 ]
 
 [package.dependencies]
@@ -1542,7 +1542,7 @@ truststore = ">=0.10"
 asyncio = ["anyio (>=4.5.0,<5.0)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
-trio = ["trio (>=0.22.0,<1.0)"]
+trio = ["trio (>=0.34.0,<1.0)"]
 
 [[package]]
 name = "httptools"
@@ -1640,29 +1640,29 @@ files = [
 
 [[package]]
 name = "httpx2"
-version = "2.7.0"
+version = "2.14.0"
 description = "The next generation HTTP client."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "httpx2-2.7.0-py3-none-any.whl", hash = "sha256:ed2a2719c696789e09493bd8e2bec3d8bd925cc6e26b68389ec25ade132f7bf4"},
-    {file = "httpx2-2.7.0.tar.gz", hash = "sha256:8b30709aed5c8465b0dd3b95c09ce301c8f79e7e7a2d00ab0af551e0d0375b07"},
+    {file = "httpx2-2.14.0-py3-none-any.whl", hash = "sha256:9d20c13a10bae1773a0be3b0f1e5beeb4bdd549bc3a2ba18efa32897c65403e4"},
+    {file = "httpx2-2.14.0.tar.gz", hash = "sha256:47ad61a3c40282cd8d0dc96311531f00f5bfc71a066c6fe3b36d8f63fb9e4f6e"},
 ]
 
 [package.dependencies]
-anyio = ">=4.10"
-httpcore2 = "2.7.0"
+anyio = {version = ">=4.10", markers = "sys_platform != \"emscripten\""}
+httpcore2 = {version = "2.14.0", markers = "sys_platform != \"emscripten\""}
 idna = ">=3.18"
-truststore = ">=0.10"
+truststore = {version = ">=0.10", markers = "sys_platform != \"emscripten\""}
 typing-extensions = {version = ">=4.5.0", markers = "python_version < \"3.13\""}
 
 [package.extras]
-brotli = ["brotli", "brotlicffi"]
-cli = ["click (>=8.4)", "pygments (==2.*)", "rich (>=10,<16)"]
+brotli = ["brotli (>=1.2.0)", "brotlicffi (>=1.2.0.2)"]
+cli = ["click (>=8.4.2)", "pygments (==2.*)", "rich (>=10,<16)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 ws = ["wsproto (>=1.2)"]
-zstd = ["zstandard (>=0.18.0)"]
+zstd = ["backports-zstd (>=1.0.0)"]
 
 [[package]]
 name = "huggingface-hub"
@@ -4894,4 +4894,4 @@ type = ["pytest-mypy (>=1.0.1)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "6424ea4218b3ddba3242f309e9fb88efb245e5796473fba6bf8adf946f61e2dc"
+content-hash = "2220052725ae2950932d2782368eb814957c5aac54458e9b39278193d662a812"
